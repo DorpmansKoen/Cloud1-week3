@@ -107,5 +107,39 @@ namespace NMCT.Cloud1.MyFirstService
             // new person naar database schrijven
             return req.CreateResponse(HttpStatusCode.OK, newP);
         }
+
+        /*
+        [FunctionName("Drink")]
+        public async static Task<HttpResponseMessage> Drink([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Drink")]HttpRequestMessage req, TraceWriter log)
+        {
+            var json = await req.Content.ReadAsStringAsync();
+            Order newOrder = null;
+            newOrder = JsonConvert.DeserializeObject<Order>(json);
+            
+            if(newOrder.MyAge >= newOrder.MyOrder.DrinkingAge)           
+                return req.CreateResponse(HttpStatusCode.OK, "You can have your drink");
+            else
+                return req.CreateResponse(HttpStatusCode.PreconditionFailed, "You can't have your drink");
+        }
+        */
+        [FunctionName("Drink")]
+        public async static Task<HttpResponseMessage> Drink([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Drink")]HttpRequestMessage req, TraceWriter log)
+        {
+            var json = await req.Content.ReadAsStringAsync();
+            Order newOrder = null;
+            newOrder = JsonConvert.DeserializeObject<Order>(json);
+
+            int customerAge = newOrder.MyAge;
+            int drinkingAge = newOrder.MyOrder.DrinkingAge;
+
+            if (customerAge >= drinkingAge && customerAge <= 100)
+                return req.CreateResponse(HttpStatusCode.OK, "You can have your drink");
+            else if (customerAge <= 0 || customerAge >= 100)
+                return req.CreateResponse(HttpStatusCode.NotAcceptable, "Invalid age");
+            else if (newOrder.MyOrder == null)
+                return req.CreateResponse(HttpStatusCode.NotAcceptable, "No drink has been ordered");
+            else
+                return req.CreateResponse(HttpStatusCode.PreconditionFailed, "You can't have your drink");
+        }
     }
 }
