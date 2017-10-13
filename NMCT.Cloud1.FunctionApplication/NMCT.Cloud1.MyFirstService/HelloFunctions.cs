@@ -34,7 +34,7 @@ namespace NMCT.Cloud1.MyFirstService
         }
         #endregion
 
-        #region Rekenen
+        #region Rekenen GET
         [FunctionName("Sum")]
         public static HttpResponseMessage Sum([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "rekenmachine/som/{getal1}/{getal2}")]HttpRequestMessage req, int getal1, int getal2, TraceWriter log)
         {
@@ -43,7 +43,7 @@ namespace NMCT.Cloud1.MyFirstService
         }
 
         [FunctionName("Divide")]
-        public static HttpResponseMessage Divide([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "rekenmachine/devide/{getal1}/{getal2}")]HttpRequestMessage req, int getal1, int getal2, TraceWriter log)
+        public static HttpResponseMessage Divide([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "rekenmachine/divide/{getal1}/{getal2}")]HttpRequestMessage req, int getal1, int getal2, TraceWriter log)
         {            
             if (getal2 != 0)
             {
@@ -54,6 +54,23 @@ namespace NMCT.Cloud1.MyFirstService
                 return req.CreateResponse(HttpStatusCode.Forbidden);
             }
             
+        }
+        #endregion
+
+        #region Rekenen POST
+
+        [FunctionName("DividePost")]
+        public async static Task<HttpResponseMessage> DividePost([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "rekenmachine/dividePost")]HttpRequestMessage req, TraceWriter log)
+        {
+            var content = await req.Content.ReadAsStringAsync();
+            log.Info(content);
+
+            var getallen = JsonConvert.DeserializeObject<Getallen>(content);            
+
+            Result r = new Result();
+            r.Quotient = getallen.Getal1 / getallen.Getal2;
+
+            return req.CreateResponse(HttpStatusCode.OK);
         }
         #endregion
 
